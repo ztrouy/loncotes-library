@@ -59,10 +59,12 @@ var CreateMaterialDTO = (Material m) =>
 app.MapGet("api/materials", (LoncotesLibraryDbContext db) =>
 {
     List<MaterialDTO> materialDTOs = db.Materials
+        .Where(m => m.OutOfCirculationSince == null)
         .Include(m => m.MaterialType)
         .Include (m => m.Genre)
         .OrderBy(m => m.MaterialName)
-        .Select(m => CreateMaterialDTO(m)).ToList();
+        .Select(m => CreateMaterialDTO(m))
+        .ToList();
 
     return materialDTOs;
 });
