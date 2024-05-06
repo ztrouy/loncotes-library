@@ -157,5 +157,19 @@ app.MapPost("api/materials", (LoncotesLibraryDbContext db, MaterialCreateDTO mat
     return Results.Created($"/api/materials/{material.Id}", material);
 });
 
+app.MapDelete("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
+{
+    Material material = db.Materials.SingleOrDefault(material => material.Id == id);
+    if (material == null)
+    {
+        return Results.NotFound();
+    }
+
+    db.Materials.Remove(material);
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
