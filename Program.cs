@@ -141,5 +141,21 @@ app.MapGet("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     return materialDTO.Any() ? Results.Ok(materialDTO[0]) : Results.NotFound();
 });
 
+app.MapPost("api/materials", (LoncotesLibraryDbContext db, MaterialCreateDTO materialToCreate) =>
+{
+    Material material = new Material()
+    {
+        MaterialName = materialToCreate.MaterialName,
+        MaterialTypeId = materialToCreate.MaterialTypeId,
+        GenreId = materialToCreate.GenreId,
+        OutOfCirculationSince = materialToCreate.OutOfCirculationSince
+    };
+
+    db.Materials.Add(material);
+    db.SaveChanges();
+
+    return Results.Created($"/api/materials/{material.Id}", material);
+});
+
 app.Run();
 
