@@ -186,5 +186,19 @@ app.MapGet("api/materialtypes", (LoncotesLibraryDbContext db) =>
     return materialTypeDTOs;
 });
 
+app.MapGet("api/genres", (LoncotesLibraryDbContext db) =>
+{
+    List<GenreDTO> genreDTOs = db.Genres
+        .Select(g => new GenreDTO()
+        {
+            Id = g.Id,
+            Name = g.Name
+        })
+        .OrderBy(g => g.Name)
+        .ToList();
+
+    return genreDTOs;
+});
+
 app.Run();
 
