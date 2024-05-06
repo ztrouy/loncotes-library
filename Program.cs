@@ -171,5 +171,20 @@ app.MapDelete("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     return Results.NoContent();
 });
 
+app.MapGet("api/materialtypes", (LoncotesLibraryDbContext db) =>
+{
+    List<MaterialTypeDTO> materialTypeDTOs = db.MaterialTypes
+        .Select(mt => new MaterialTypeDTO()
+        {
+            Id = mt.Id,
+            Name = mt.Name,
+            CheckoutDays = mt.CheckoutDays
+        })
+        .OrderBy(mt => mt.Name)
+        .ToList();
+
+    return materialTypeDTOs;
+});
+
 app.Run();
 
