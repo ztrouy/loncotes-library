@@ -165,7 +165,7 @@ app.MapDelete("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
         return Results.NotFound();
     }
 
-    db.Materials.Remove(material);
+    material.OutOfCirculationSince = DateTime.Now;
     db.SaveChanges();
 
     return Results.NoContent();
