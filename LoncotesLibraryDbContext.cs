@@ -90,6 +90,5 @@ public class LoncotesLibraryDbContext : DbContext
             new Checkout {Id = 25, MaterialId = 11, PatronId = 5, CheckoutDate = new DateTime(2024, 04, 22), ReturnDate = null},
             new Checkout {Id = 26, MaterialId = 12, PatronId = 5, CheckoutDate = new DateTime(2024, 04, 22), ReturnDate = null}
         });
-
     }
 }
