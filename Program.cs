@@ -200,5 +200,24 @@ app.MapGet("api/genres", (LoncotesLibraryDbContext db) =>
     return genreDTOs;
 });
 
+app.MapGet("api/patrons", (LoncotesLibraryDbContext db) =>
+{
+    List<PatronDTO> patronDTOs = db.Patrons
+        .Select(p => new PatronDTO()
+        {
+            Id = p.Id,
+            FirstName = p.FirstName,
+            LastName = p.LastName,
+            Address = p.Address,
+            Email = p.Email,
+            IsActive = p.IsActive
+        })
+        .OrderBy(p => p.LastName)
+        .ThenBy(p => p.FirstName)
+        .ToList();
+
+    return patronDTOs;
+});
+
 app.Run();
 
