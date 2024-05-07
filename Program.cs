@@ -270,5 +270,25 @@ app.MapGet("api/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
     return patronDTO.Any() ? Results.Ok(patronDTO[0]) : Results.NotFound();
 });
 
+app.MapPut("api/patrons/{id}", (LoncotesLibraryDbContext db, int id, PatronUpdateDTO update) =>
+{
+    if (update.Id != id)
+    {
+        return Results.BadRequest();
+    }
+    
+    Patron foundPatron = db.Patrons.SingleOrDefault(p => p.Id == id);
+    if (foundPatron == null)
+    {
+        return Results.NotFound();
+    }
+
+    foundPatron.Address = update.Address;
+    foundPatron.Email = update.Email;
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
