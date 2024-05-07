@@ -103,6 +103,43 @@ var CreateDetailedMaterialDTO = (Material m) =>
     return materialDTO;
 };
 
+var CreatePatronDTO = (Patron p) =>
+{
+    PatronDTO patronDTO = new PatronDTO()
+    {
+        Id = p.Id,
+        FirstName = p.FirstName,
+        LastName = p.LastName,
+        Address = p.Address,
+        Email = p.Email,
+        IsActive = p.IsActive,
+        Checkouts = p.Checkouts.Select(c => new CheckoutDTO()
+        {
+            Id = c.Id,
+            MaterialId = c.MaterialId,
+            PatronId = c.PatronId,
+            CheckoutDate = c.CheckoutDate,
+            ReturnDate = c.ReturnDate,
+            Material = new MaterialDTO()
+            {
+                Id = c.Material.Id,
+                MaterialName = c.Material.MaterialName,
+                MaterialTypeId = c.Material.MaterialTypeId,
+                GenreId = c.Material.GenreId,
+                OutOfCirculationSince = c.Material.OutOfCirculationSince,
+                MaterialType = new MaterialTypeDTO()
+                {
+                    Id = c.Material.MaterialType.Id,
+                    Name = c.Material.MaterialType.Name,
+                    CheckoutDays = c.Material.MaterialType.CheckoutDays
+                }
+            }
+        }).ToList()
+    };
+
+    return patronDTO;
+};
+
 app.MapGet("api/materials", (LoncotesLibraryDbContext db, int? materialTypeId, int? genreId) =>
 {
     List<MaterialDTO> materialDTOs = db.Materials
@@ -217,6 +254,20 @@ app.MapGet("api/patrons", (LoncotesLibraryDbContext db) =>
         .ToList();
 
     return patronDTOs;
+});
+
+app.MapGet("api/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
+{
+    List<PatronDTO> patronDTO = null;
+    patronDTO = db.Patrons
+        .Where(p => p.Id == id)
+        .Include(p => p.Checkouts)
+        .ThenInclude(c => c.Material)
+        .ThenInclude(m => m.MaterialType)
+        .Select(p => CreatePatronDTO(p))
+        .ToList();
+
+    return patronDTO.Any() ? Results.Ok(patronDTO[0]) : Results.NotFound();
 });
 
 app.Run();
