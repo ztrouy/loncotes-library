@@ -304,5 +304,60 @@ app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) 
     return Results.NoContent();
 });
 
+app.MapPost("api/checkouts", (LoncotesLibraryDbContext db, CheckoutCreateDTO checkout) =>
+{
+    Material foundMaterial = db.Materials.SingleOrDefault(m => m.Id == checkout.MaterialId);
+    if (foundMaterial == null)
+    {
+        return Results.NotFound("Could not find chosen Material");
+    }
+
+    Patron foundPatron = db.Patrons.SingleOrDefault(p => p.Id == checkout.PatronId);
+    if (foundPatron == null)
+    {
+        return Results.NotFound("Could not find chosen Patron");
+    }
+
+    Checkout newCheckout = new Checkout()
+    {
+        MaterialId = checkout.MaterialId,
+        PatronId = checkout.PatronId,
+        CheckoutDate = DateTime.Now,
+        ReturnDate = null
+    };
+
+    db.Checkouts.Add(newCheckout);
+    db.SaveChanges();
+
+    CheckoutDTO checkoutDTO = new CheckoutDTO()
+    {
+        Id = newCheckout.Id,
+        MaterialId = newCheckout.MaterialId,
+        PatronId = newCheckout.PatronId,
+        CheckoutDate = newCheckout.CheckoutDate,
+        ReturnDate = newCheckout.ReturnDate
+    };
+
+    return Results.Created($"api/checkouts/{newCheckout.Id}", checkoutDTO);
+});
+
+app.MapPut("api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) =>
+{
+    Checkout foundCheckout = db.Checkouts.SingleOrDefault(c => c.Id == id);
+    if (foundCheckout == null)
+    {
+        return Results.NotFound();
+    }
+    if (foundCheckout.ReturnDate != null)
+    {
+        return Results.Conflict("This Material has already been returned!");
+    }
+
+    foundCheckout.ReturnDate = DateTime.Now;
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
