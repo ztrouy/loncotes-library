@@ -319,6 +319,16 @@ app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) 
     return Results.NoContent();
 });
 
+app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
+{
+    List<CheckoutDTO> checkoutDTOs = db.Checkouts
+        .Include(c => c.Patron)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.Genre)
+        .Include(m => m.MaterialType)
+
+});
+
 app.MapPost("api/checkouts", (LoncotesLibraryDbContext db, CheckoutCreateDTO checkout) =>
 {
     Material foundMaterial = db.Materials.SingleOrDefault(m => m.Id == checkout.MaterialId);
