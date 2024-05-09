@@ -475,5 +475,23 @@ app.MapPut("api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) =>
     return Results.NoContent();
 });
 
+app.MapPut("api/checkouts/{id}/pay", (LoncotesLibraryDbContext db, int id) =>
+{
+    Checkout foundCheckout = db.Checkouts.SingleOrDefault(c => c.Id == id);
+    if (foundCheckout.ReturnDate == null)
+    {
+        return Results.BadRequest("That Material has not yet been returned!");
+    }
+    if (foundCheckout.Paid == true)
+    {
+        return Results.BadRequest("This balance was already paid!");
+    }
+
+    foundCheckout.Paid = true;
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
