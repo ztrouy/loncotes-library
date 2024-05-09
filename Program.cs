@@ -79,7 +79,7 @@ var CreateCheckoutDTO = (Checkout c) =>
 
 var CreateDetailedCheckoutDTO = (Checkout c) =>
 {
-    CheckoutDTO checkoutDTO = new CheckoutDTO()
+    CheckoutLateFeeDTO checkoutDTO = new CheckoutLateFeeDTO()
     {
         Id = c.Id,
         MaterialId = c.MaterialId,
@@ -363,7 +363,7 @@ app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) 
 
 app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 {
-    List<CheckoutDTO> checkoutDTOs = db.Checkouts
+    List<CheckoutLateFeeDTO> checkoutDTOs = db.Checkouts
         .Include(c => c.Patron)
         .Include(c => c.Material)
         .ThenInclude(m => m.Genre)
