@@ -420,6 +420,26 @@ app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
     return checkoutDTOs;
 });
 
+app.MapGet("api/checkouts/unpaid", (LoncotesLibraryDbContext db) =>
+{
+    List<CheckoutLateFeeDTO> checkoutDTOs = db.Checkouts
+        .Include(c => c.Patron)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.Genre)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.MaterialType)
+        .Where(c => (
+            (((DateTime.Today - c.CheckoutDate).Days > c.Material.MaterialType.CheckoutDays) &&
+            (c.ReturnDate == null)) || (c.ReturnDate != null ?
+            ((((DateTime)c.ReturnDate - c.CheckoutDate).Days > c.Material.MaterialType.CheckoutDays) &&
+            (c.Paid == false)) : false)
+        ))
+        .Select(c => CreateDetailedCheckoutDTO(c))
+        .ToList();
+
+    return checkoutDTOs;
+});
+
 app.MapPost("api/checkouts", (LoncotesLibraryDbContext db, CheckoutCreateDTO checkout) =>
 {
     Material foundMaterial = db.Materials.SingleOrDefault(m => m.Id == checkout.MaterialId);
