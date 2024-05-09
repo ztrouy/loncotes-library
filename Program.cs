@@ -63,6 +63,7 @@ var CreateCheckoutDTO = (Checkout c) =>
         PatronId = c.PatronId,
         CheckoutDate = c.CheckoutDate,
         ReturnDate = c.ReturnDate,
+        Paid = c.Paid,
         Patron = new PatronDTO()
         {
             Id = c.Patron.Id,
@@ -86,6 +87,7 @@ var CreateDetailedCheckoutDTO = (Checkout c) =>
         PatronId = c.PatronId,
         CheckoutDate = c.CheckoutDate,
         ReturnDate = c.ReturnDate,
+        Paid = c.Paid,
         Patron = new PatronDTO()
         {
             Id = c.Patron.Id,
@@ -162,6 +164,45 @@ var CreatePatronDTO = (Patron p) =>
             PatronId = c.PatronId,
             CheckoutDate = c.CheckoutDate,
             ReturnDate = c.ReturnDate,
+            Paid = c.Paid,
+            Material = new MaterialDTO()
+            {
+                Id = c.Material.Id,
+                MaterialName = c.Material.MaterialName,
+                MaterialTypeId = c.Material.MaterialTypeId,
+                GenreId = c.Material.GenreId,
+                OutOfCirculationSince = c.Material.OutOfCirculationSince,
+                MaterialType = new MaterialTypeDTO()
+                {
+                    Id = c.Material.MaterialType.Id,
+                    Name = c.Material.MaterialType.Name,
+                    CheckoutDays = c.Material.MaterialType.CheckoutDays
+                }
+            }
+        }).ToList()
+    };
+
+    return patronDTO;
+};
+
+var CreatePatronWithBalanceDTO = (Patron p) =>
+{
+    PatronWithBalanceDTO patronDTO = new PatronWithBalanceDTO()
+    {
+        Id = p.Id,
+        FirstName = p.FirstName,
+        LastName = p.LastName,
+        Address = p.Address,
+        Email = p.Email,
+        IsActive = p.IsActive,
+        Checkouts = p.Checkouts.Select(c => new CheckoutLateFeeDTO()
+        {
+            Id = c.Id,
+            MaterialId = c.MaterialId,
+            PatronId = c.PatronId,
+            CheckoutDate = c.CheckoutDate,
+            ReturnDate = c.ReturnDate,
+            Paid = c.Paid,
             Material = new MaterialDTO()
             {
                 Id = c.Material.Id,
@@ -315,13 +356,13 @@ app.MapGet("api/patrons", (LoncotesLibraryDbContext db) =>
 
 app.MapGet("api/patrons/{id}", (LoncotesLibraryDbContext db, int id) =>
 {
-    List<PatronDTO> patronDTO = null;
+    List<PatronWithBalanceDTO> patronDTO = null;
     patronDTO = db.Patrons
         .Where(p => p.Id == id)
         .Include(p => p.Checkouts)
         .ThenInclude(c => c.Material)
         .ThenInclude(m => m.MaterialType)
-        .Select(p => CreatePatronDTO(p))
+        .Select(p => CreatePatronWithBalanceDTO(p))
         .ToList();
 
     return patronDTO.Any() ? Results.Ok(patronDTO[0]) : Results.NotFound();
