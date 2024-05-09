@@ -141,7 +141,43 @@ var CreateDetailedMaterialDTO = (Material m) =>
             Id = m.Genre.Id,
             Name = m.Genre.Name
         },
-        Checkouts = m.Checkouts.Select(c => CreateCheckoutDTO(c)).ToList()
+        Checkouts = m.Checkouts.Select(c => new CheckoutLateFeeDTO()
+        {
+            Id = c.Id,
+            MaterialId = c.MaterialId,
+            PatronId = c.PatronId,
+            CheckoutDate = c.CheckoutDate,
+            ReturnDate = c.ReturnDate,
+            Paid = c.Paid,
+            Material = new MaterialDTO()
+            {
+                Id = m.Id,
+                MaterialName = m.MaterialName,
+                MaterialTypeId = m.MaterialTypeId,
+                GenreId = m.GenreId,
+                OutOfCirculationSince = m.OutOfCirculationSince,
+                MaterialType = new MaterialTypeDTO()
+                {
+                    Id = m.MaterialType.Id,
+                    Name = m.MaterialType.Name,
+                    CheckoutDays = m.MaterialType.CheckoutDays
+                },
+                Genre = new GenreDTO()
+                {
+                    Id = m.Genre.Id,
+                    Name = m.Genre.Name
+                }
+            },
+            Patron = new PatronDTO()
+            {
+                Id = c.Patron.Id,
+                FirstName = c.Patron.FirstName,
+                LastName = c.Patron.LastName,
+                Address = c.Patron.Address,
+                Email = c.Patron.Email,
+                IsActive = c.Patron.IsActive,
+            }
+        }).ToList()
     };
 
     return materialDTO;
