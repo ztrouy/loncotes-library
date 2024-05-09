@@ -77,6 +77,48 @@ var CreateCheckoutDTO = (Checkout c) =>
     return checkoutDTO;
 };
 
+var CreateDetailedCheckoutDTO = (Checkout c) =>
+{
+    CheckoutDTO checkoutDTO = new CheckoutDTO()
+    {
+        Id = c.Id,
+        MaterialId = c.MaterialId,
+        PatronId = c.PatronId,
+        CheckoutDate = c.CheckoutDate,
+        ReturnDate = c.ReturnDate,
+        Patron = new PatronDTO()
+        {
+            Id = c.Patron.Id,
+            FirstName = c.Patron.FirstName,
+            LastName = c.Patron.LastName,
+            Address = c.Patron.Address,
+            Email = c.Patron.Email,
+            IsActive = c.Patron.IsActive
+        },
+        Material = new MaterialDTO()
+        {
+            Id = c.Material.Id,
+            MaterialName = c.Material.MaterialName,
+            MaterialTypeId = c.Material.MaterialTypeId,
+            GenreId = c.Material.GenreId,
+            OutOfCirculationSince = c.Material.OutOfCirculationSince,
+            MaterialType = new MaterialTypeDTO()
+            {
+                Id = c.Material.MaterialType.Id,
+                Name = c.Material.MaterialType.Name,
+                CheckoutDays = c.Material.MaterialType.CheckoutDays
+            },
+            Genre = new GenreDTO()
+            {
+                Id = c.Material.Genre.Id,
+                Name = c.Material.Genre.Name
+            }
+        }
+    };
+
+    return checkoutDTO;
+};
+
 var CreateDetailedMaterialDTO = (Material m) =>
 {
     MaterialDetailedDTO materialDTO = new MaterialDetailedDTO()
@@ -325,8 +367,16 @@ app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
         .Include(c => c.Patron)
         .Include(c => c.Material)
         .ThenInclude(m => m.Genre)
-        .Include(m => m.MaterialType)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.MaterialType)
+        .Where(c => (
+            ((DateTime.Today - c.CheckoutDate).Days > c.Material.MaterialType.CheckoutDays) &&
+            (c.ReturnDate == null)
+        ))
+        .Select(c => CreateDetailedCheckoutDTO(c))
+        .ToList();
 
+    return checkoutDTOs;
 });
 
 app.MapPost("api/checkouts", (LoncotesLibraryDbContext db, CheckoutCreateDTO checkout) =>
