@@ -421,7 +421,7 @@ app.MapPut("api/patrons/{id}", (LoncotesLibraryDbContext db, int id, PatronUpdat
     foundPatron.Email = update.Email;
     db.SaveChanges();
 
-    return Results.NoContent();
+    return Results.Ok("Patron updated!");
 });
 
 app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) =>
