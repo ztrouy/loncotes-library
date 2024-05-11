@@ -435,7 +435,7 @@ app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) 
     foundPatron.IsActive = false; 
     db.SaveChanges();
 
-    return Results.NoContent();
+    return Results.Ok("Deactivated Patron!");
 });
 
 app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
