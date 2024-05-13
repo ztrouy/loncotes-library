@@ -339,7 +339,7 @@ app.MapDelete("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     material.OutOfCirculationSince = DateTime.Now;
     db.SaveChanges();
 
-    return Results.Ok("Material is now out of circulation!");
+    return Results.NoContent();
 });
 
 app.MapGet("api/materialtypes", (LoncotesLibraryDbContext db) =>
@@ -421,7 +421,7 @@ app.MapPut("api/patrons/{id}", (LoncotesLibraryDbContext db, int id, PatronUpdat
     foundPatron.Email = update.Email;
     db.SaveChanges();
 
-    return Results.Ok("Patron updated!");
+    return Results.NoContent();
 });
 
 app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) =>
@@ -435,7 +435,7 @@ app.MapPut("api/patrons/{id}/deactivate", (LoncotesLibraryDbContext db, int id) 
     foundPatron.IsActive = false; 
     db.SaveChanges();
 
-    return Results.Ok("Deactivated Patron!");
+    return Results.NoContent();
 });
 
 app.MapPut("api/patrons/{id}/reactivate", (LoncotesLibraryDbContext db, int id) =>
@@ -449,7 +449,7 @@ app.MapPut("api/patrons/{id}/reactivate", (LoncotesLibraryDbContext db, int id) 
     foundPatron.IsActive = true; 
     db.SaveChanges();
 
-    return Results.Ok("Activated Patron!");
+    return Results.NoContent();
 });
 
 app.MapGet("api/checkouts", (LoncotesLibraryDbContext db) =>
@@ -557,7 +557,7 @@ app.MapPut("api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) =>
     foundCheckout.ReturnDate = DateTime.Now;
     db.SaveChanges();
 
-    return Results.Ok("Material returned!");
+    return Results.NoContent();
 });
 
 app.MapPut("api/checkouts/{id}/pay", (LoncotesLibraryDbContext db, int id) =>
