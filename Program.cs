@@ -339,7 +339,7 @@ app.MapDelete("api/materials/{id}", (LoncotesLibraryDbContext db, int id) =>
     material.OutOfCirculationSince = DateTime.Now;
     db.SaveChanges();
 
-    return Results.NoContent();
+    return Results.Ok("Material is now out of circulation!");
 });
 
 app.MapGet("api/materialtypes", (LoncotesLibraryDbContext db) =>
