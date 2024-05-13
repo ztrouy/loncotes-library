@@ -542,7 +542,7 @@ app.MapPut("api/checkouts/{id}/return", (LoncotesLibraryDbContext db, int id) =>
     foundCheckout.ReturnDate = DateTime.Now;
     db.SaveChanges();
 
-    return Results.NoContent();
+    return Results.Ok("Material returned!");
 });
 
 app.MapPut("api/checkouts/{id}/pay", (LoncotesLibraryDbContext db, int id) =>
