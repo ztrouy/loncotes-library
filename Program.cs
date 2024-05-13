@@ -452,6 +452,21 @@ app.MapPut("api/patrons/{id}/reactivate", (LoncotesLibraryDbContext db, int id) 
     return Results.Ok("Activated Patron!");
 });
 
+app.MapGet("api/checkouts", (LoncotesLibraryDbContext db) =>
+{
+    List<CheckoutLateFeeDTO> checkoutDTOs = db.Checkouts
+        .Include(c => c.Patron)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.Genre)
+        .Include(c => c.Material)
+        .ThenInclude(m => m.MaterialType)
+        .Where(c => c.ReturnDate == null)
+        .Select(c => CreateDetailedCheckoutDTO(c))
+        .ToList();
+
+    return checkoutDTOs;
+});
+
 app.MapGet("api/checkouts/overdue", (LoncotesLibraryDbContext db) =>
 {
     List<CheckoutLateFeeDTO> checkoutDTOs = db.Checkouts
